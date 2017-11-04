@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
-import Book from './Book.js'
+import Book from './Book'
 
 export const CURRENTLY_READING = "currentlyReading";
 export const WANT_TO_READ = "wantToRead";
