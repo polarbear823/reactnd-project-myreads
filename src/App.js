@@ -1,7 +1,9 @@
 import React, {Component} from 'react'
+import { Route } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
-import Book from './Book'
+import BooksShelf from './BooksShelf'
+import Search from './Search'
 
 export const CURRENTLY_READING = "currentlyReading";
 export const WANT_TO_READ = "wantToRead";
@@ -16,7 +18,6 @@ class BooksApp extends Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     books: [],
-    showSearchPage: false
   }
 
   componentDidMount() {
@@ -25,84 +26,33 @@ class BooksApp extends Component {
     });
   }
 
-  //TODO integrate with API (implement after refresh, the book shelf does not change)
-  updateBook = (book) => {
-    this.setState(state => ({
-      books: state.books.filter((b) => b.id !== book.id).concat([book])
-    }));
+  updateBook = (book, shelf) => {
+    BooksAPI.update(book, shelf).then((res) => {
+      book.shelf = shelf;
+      this.setState(state => ({
+        books: state.books.filter((b) => b.id !== book.id).concat(book)
+      }));
+    });
   }
 
   render() {
     return (
       <div className="app">
-        {this.state.showSearchPage ? (
-          <div className="search-books">
-            <div className="search-books-bar">
-              <a className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</a>
-              <div className="search-books-input-wrapper">
-                {/*
-                  NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                  You can find these search terms here:
-                  https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
-
-                  However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                  you don't find a specific author or title. Every search is limited by search terms.
-                */}
-                <input type="text" placeholder="Search by title or author"/>
-
-              </div>
-            </div>
-            <div className="search-books-results">
-              <ol className="books-grid"></ol>
-            </div>
-          </div>
-        ) : (
-          <div className="list-books">
-            <div className="list-books-title">
-              <h1>MyReads</h1>
-            </div>
-            <div className="list-books-content">
-              <div>
-                <div className="bookshelf">
-                  <h2 className="bookshelf-title">Currently Reading</h2>
-                  <div className="bookshelf-books">
-                    <ol className="books-grid">
-                      {
-                        this.state.books.filter((book) => CURRENTLY_READING === book.shelf)
-                                        .map((book) => <Book book={book} onSelectChange={this.updateBook} key={book.id}/>)
-                      }
-                    </ol>
-                  </div>
-                </div>
-                <div className="bookshelf">
-                  <h2 className="bookshelf-title">Want to Read</h2>
-                  <div className="bookshelf-books">
-                    <ol className="books-grid">
-                      {
-                        this.state.books.filter((book) => WANT_TO_READ === book.shelf)
-                                        .map((book) => <Book book={book} onSelectChange={this.updateBook} key={book.id}/>)
-                      }
-                    </ol>
-                  </div>
-                </div>
-                <div className="bookshelf">
-                  <h2 className="bookshelf-title">Read</h2>
-                  <div className="bookshelf-books">
-                    <ol className="books-grid">
-                      {
-                        this.state.books.filter((book) => READ === book.shelf)
-                                        .map((book) => <Book book={book} onSelectChange={this.updateBook} key={book.id}/>)
-                      }
-                    </ol>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="open-search">
-              <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a>
-            </div>
-          </div>
-        )}
+        <Route exact path='/' render={() => (
+          <BooksShelf
+            books={this.state.books}
+            updateBook={this.updateBook}
+          />
+        )}/>
+        <Route path='/search' render={({history}) => (
+          <Search
+            onBookStatusChange={(book, shelf) => {
+              this.updateBook(book, shelf);
+              history.push('/');
+            }}
+            booksOnShelf={this.state.books}
+          />
+        )}/>
       </div>
     )
   }

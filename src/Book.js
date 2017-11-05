@@ -4,8 +4,8 @@ import {CURRENTLY_READING, WANT_TO_READ, READ, NONE} from './App'
 
 const Book = (bookProps) => {
   const onShelfChange = e => {
-    bookProps.book.shelf = e.target.value;
-    bookProps.onSelectChange(bookProps.book);
+    let shelf = e.target.value;
+    bookProps.onSelectChange(bookProps.book, shelf);
   }
   return (
     <li>
@@ -13,7 +13,7 @@ const Book = (bookProps) => {
         <div className="book-top">
           <img className="book-cover" style={{ width: 128, height: 192 }} src={bookProps.book.imageLinks.thumbnail} alt={bookProps.book.title} />
           <div className="book-shelf-changer">
-            <select value={bookProps.book.shelf} onChange={onShelfChange}>
+            <select value={bookProps.book.shelf ? bookProps.book.shelf : NONE} onChange={onShelfChange}>
               <option value="moveTo" disabled>Move to...</option>
               <option value={CURRENTLY_READING}>Currently Reading</option>
               <option value={WANT_TO_READ}>Want to Read</option>
@@ -23,7 +23,7 @@ const Book = (bookProps) => {
           </div>
         </div>
         <div className="book-title">{bookProps.book.title}</div>
-        {bookProps.book.authors.map((author) => <div className="book-authors" key={author}>{author}</div>)}     
+        { bookProps.book.authors ? bookProps.book.authors.map((author) => <div className="book-authors" key={author}>{author}</div>) : null}     
       </div>
     </li>
   );}
