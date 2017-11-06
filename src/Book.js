@@ -11,7 +11,7 @@ const Book = (bookProps) => {
     <li>
       <div className="book">
         <div className="book-top">
-          <img className="book-cover" style={{ width: 128, height: 192 }} src={bookProps.book.imageLinks.thumbnail} alt={bookProps.book.title} />
+          <img className="book-cover" style={{ width: 128, height: 192 }} src={bookProps.book.imageLinks ? bookProps.book.imageLinks.thumbnail : ""} alt={bookProps.book.title} />
           <div className="book-shelf-changer">
             <select value={bookProps.book.shelf ? bookProps.book.shelf : NONE} onChange={onShelfChange}>
               <option value="moveTo" disabled>Move to...</option>
@@ -23,7 +23,7 @@ const Book = (bookProps) => {
           </div>
         </div>
         <div className="book-title">{bookProps.book.title}</div>
-        { bookProps.book.authors ? bookProps.book.authors.map((author) => <div className="book-authors" key={author}>{author}</div>) : null}     
+        { bookProps.book.authors ? bookProps.book.authors.map((author) => <div className="book-authors" key={author}>{author}</div>) : null}
       </div>
     </li>
   );}
